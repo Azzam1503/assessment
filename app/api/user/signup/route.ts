@@ -2,6 +2,7 @@ import connect from "@/helpers/db";
 import User from "@/models/user";
 import { NextRequest, NextResponse } from "next/server";
 import { SignupSchema } from "@/types";
+import bcryptjs from "bcryptjs";
 
 connect();
 
@@ -14,13 +15,14 @@ export async function POST(req: NextRequest){
             NextResponse.json({message: "Invalid inputs"}, {status: 401});
         };
         const {name, email, password, role} = body;
-
+        const salt = bcryptjs.genSaltSync(10);
+        const hashedPassword = bcryptjs.hashSync(password, salt); 
         const existing = await User.findOne({email});
         if(existing){
             NextResponse.json({message: "User already exist"}, {status: 401});
         };
         const user = await  User.create({
-            name, email, password, role
+            name, email, password: hashedPassword, role
         });
         console.log(user);
         return NextResponse.json({user}, {status: 200});
