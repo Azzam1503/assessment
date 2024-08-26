@@ -21,11 +21,12 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({message: "No user found"}, {status: 402});
         }
         const comparedPassword = bcryptjs.compareSync(password, user.password);
+        console.log(comparedPassword);
         if(!comparedPassword){
-            return NextResponse.json({message: "Invalid Passowrd"}, {status: 402});
+            return NextResponse.json({message: "Invalid Passowrd"}, {status: 400});
         }
 
-        const token = jwt.sign({id: user._id, email: user.email}, process.env.JWT_SECRET!, {expiresIn: '7d'});
+        const token = jwt.sign({id: user._id, email: user.email, role: user.role}, process.env.JWT_SECRET!, {expiresIn: '7d'});
         
         const response = NextResponse.json({
             message:"Logged In Successfully",
